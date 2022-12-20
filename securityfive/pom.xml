@@ -9,11 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>securitythree</artifactId>
-    <packaging>pom</packaging>
-    <modules>
-        <module>encrypt</module>
-    </modules>
+    <artifactId>securityfive</artifactId>
 
 
 </project>

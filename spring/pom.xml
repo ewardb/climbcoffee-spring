@@ -9,11 +9,20 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>securitythree</artifactId>
-    <packaging>pom</packaging>
-    <modules>
-        <module>encrypt</module>
-    </modules>
+    <artifactId>spring</artifactId>
+
+
+
+    <dependencies>
+        <!-- https://mvnrepository.com/artifact/cglib/cglib -->
+        <dependency>
+            <groupId>cglib</groupId>
+            <artifactId>cglib</artifactId>
+            <version>3.3.0</version>
+        </dependency>
+
+    </dependencies>
+
 
 
 </project>

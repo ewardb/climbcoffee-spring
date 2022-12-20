@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans>
+
+
+<!--    <bean id="userDao" class="bean.UserDao"></bean>-->
+
+
+<!--    <bean id="userService" class="bean.UserService">-->
+<!--        <property name="uId" value="10001"></property>-->
+<!--        <property name="userDao" ref="userDao"></property>-->
+<!--    </bean>-->
+
+
+<!--    <bean id="userDao" class="bean.UserDao" init-method="initDataMethod" destroy-method="destroyDataMethod"/>-->
+
+<!--    <bean id="userService" class="bean.UserService">-->
+<!--        <property name="uId" value="10001"/>-->
+<!--        <property name="company" value="腾讯"/>-->
+<!--        <property name="location" value="深圳"/>-->
+<!--        <property name="userDao" ref="userDao"/>-->
+<!--    </bean>-->
+
+
+
+
+
+    <bean id="userService" class="young.spring.bean.UserService" scope="prototype">
+        <property name="uId" value="10001"/>
+        <property name="company" value="腾讯"/>
+        <property name="location" value="深圳"/>
+        <property name="iUserDao" ref="proxyUserDao"/>
+    </bean>
+
+    <bean id="proxyUserDao" class="young.spring.factorybean.ProxyBeanFactory"/>
+
+
+
+    <bean class="young.spring.event.ContextRefreshedEventListener"/>
+
+    <bean class="young.spring.event.CustomEventListener"/>
+
+    <bean class="young.spring.event.ContextClosedEventListener"/>
+
+
+
+
+    <bean id="dogService" class="young.spring.bean.DogService"/>
+
+    <bean class="young.spring.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator"/>
+
+    <bean id="beforeAdvice" class="young.spring.bean.DogServiceBeforeAdvice"/>
+
+    <bean id="methodInterceptor" class="young.spring.aop.framework.adapter.MethodBeforeAdviceInterceptor">
+        <property name="advice" ref="beforeAdvice"/>
+    </bean>
+
+    <bean id="pointcutAdvisor" class="young.spring.aop.aspectj.AspectJExpressionPointcutAdvisor">
+        <property name="expression" value="execution(* bean.IDogService.*(..))"/>
+        <property name="advice" ref="methodInterceptor"/>
+    </bean>
+
+
+
+</beans>

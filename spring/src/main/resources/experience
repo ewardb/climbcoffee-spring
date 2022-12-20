@@ -1,0 +1,87 @@
+一:
+基调：beanDefinition、 beanFactory
+二:
+1、我们对bean进行分类、那么便有单例、原型直说；对于单例bean来说。有一个保存单例bean的地儿。所有的bean都是由bean工厂来生产。
+2、当工厂生产bean，采用的原料就是beanDefinition。所以 ，beanFactory理应有 获取beanDefinition的能力。beanDefinition在工厂生成，由工厂获取。
+3、单例bean有一个注册的地儿，那就是SingletonBeanRegisitry。工厂生产好后， 如果是单例bean。进行注册即可。
+4、工厂在获取bean时，如果是单例bean， 那么可以先到注册单例bean注册机中获取， 没有的话再去创建。
+三:
+1、在创建bean实例的时候， 可以指定创建策略， 比如，你可以指定cglib 创建实例；
+2、基于构造方法进行构建， clazz.getDeclaringClass().newInstance() || clazz.getDeclaringClass(class.getParam()).newInstance。
+3、基于cglib进行构建   enhancer =   new Enhancer(); enhancer.setCallback() && enhancer.setSuperClass() &&
+                                     [enchaner.crete() ||  enchancer.crete(ctor.getParameterTypes(), args)];
+四: 实例化、初始化
+1、对于beanDefinition来说， 不仅需要class信息， 一个对象需要初始化。那么他需要属性；
+2、属性，有基本属性、引用属性（beanRenfrece）.
+3、在实例化后， 需要对实例化对象进行初始化。 如果是引用对象， 需要对引用对象实例化、初始化后  然后在进行初始化；
+五: 解析beanDefinition，进行注册
+1、怎样将beanDefinition 自动化的加载到我们的系统呢？ 那就是 beanDefinitionReader  这个beanDefinitionReader 既有BeanDefinitionRegistry 并且还有resource
+2、beanFacory 同样拥有beanDefinitionRegistry。
+3、resorce 通过resourceLoader进行加载， 这些resource包括 1、urlResource 2、FileSystemResource 3、ClassPathResource
+4、最终其实都是inputStream.
+六: 所向披靡，实现应用上下文，自动识别、资源加载、扩展机制
+1、目标--因为用户需要很多的自定义，所以， 这些都必须在【beanDefinition】中提现。既流程为 加载 --> 注册 --> 【修改beanDefinition】 --> 实例化 --> 【扩展bean实例化】
+2、满足扩展的bean扩展的顶级接口 我们定义为 BeanFactoryPostProcess and BeanPostProcessor
+3、前提是一切为了更好地、方便的使用。 使用applicationContext 将factory、resourceLoader 进行整合
+4、容器刷新时， 初始化工厂、beandefinition、beanfacotryPostProcessor、 beanPostProcessor 这些都配置好。最后实例化单例对象
+七: 对象初始化、销毁、钩子
+1、对象实例化后，对于对象的初始化 1、InitializeBean.afterProperties()  2、xml中自定义初始化。 但是对于这两个初始化， 有优先级。1 > 2
+2、对象既然有初始化、就会有销毁。销毁方法 1、DisposableBean.destrory()  2、xml中自定义销毁。  但是 对于这个销毁， 有优先级  1 > 2
+3、初始化容器的时候， 可以注册一个关闭的销毁的钩子。 当容器关闭的时候， 触发钩子进行销毁。
+八: 容器感知Aware
+1、容器感知在spring中很有必要。 相当于给bean 一个扩展属性， 比如，这个bean的  beanName, classLoader、beanFactory、applicationContext等等
+2、在bean初始化的时候， beanName 、 classLoader、 beanFactory 这些都是在beanFactory 中 【都可get到的】
+3、在bean初始化的时候， applicationContext 再beanFactory 是【不可get到的】
+4、beanFactory中提供了beanPostProcess 进行对bean的扩展。因此， 这个需要在容器启动的时候进行 注册到beanFactroy中
+九: 对于非spirng框架， spring怎样管理非spring框架中的bean？？ eg：mybaits、rabbitMQ？？？？？？？答案是FactoryBean
+1、实现内容 【FactoryBean、scope】
+1、factoryBean 是一个接入外部bean 且被spring管理的一个途径;
+2、scope --> 单例  原型
+3、dogetBean的时候， 统一放在 factoryBean的 实现类中处理
+十: 容器事件和事件监听器
+1、java提供了 EventObject 、EventListener 这两个顶层定义;
+2、自定义 发布事件器，  事件广播器
+3、容器进行初始化广播器，
+十一: Cglib jdk aop
+1、实现aop需要按照aopalliance 约定的 连接点、方法拦截器， 方法执行器这一套
+2、利用aspectJ的 判断表达式， 进行切面的描述
+3、方法代理，完全是因为 methodIntercept 的intercept 有 代理方法 proxyMethod.
+4、ReflectiveMethodInvocation  方法执行器， 最终持有、代理方法， 目标对象、 方法 、参数
+十二: 把aop 动态代理  融入到springbeans中去
+1、定义Advice拦截器链  BeforeAdvice MethodBeforeAdvice；  在 Spring 框架中，Advice 都是通过方法拦截器 MethodInterceptor 实现的
+2、定义 Advisor 访问者  Advisor 承担了 Pointcut 和 Advice 的组合，Pointcut 用于获取 JoinPoint，而 Advice 决定于 JoinPoint 执行什么操作
+3、方法拦截器 MethodBeforeAdviceInterceptor MethodBeforeAdviceInterceptor 实现了 MethodInterceptor 接口，
+在 invoke 方法中调用 advice 中的 before 方法，传入对应的参数信息。而这个 advice.before 则是用于自己实现 MethodBeforeAdvice 接口后做的相应处理。
+！！！其实可以看到具体的 MethodInterceptor 实现类，其实和我们之前做的测试是一样的，只不过现在交给了 Spring 来处理！！！
+十三: 通过注解配置和包自动扫描的方式完成Bean对象的注册
+1、注册beanDefinition，通过包扫描的方式， 读取xml；
+2、beanfacotryPostProcessor 的一个应用。 xml中 占位符的一个应用； PropertyPlaceholderConfigurer
+3、注解 Component Scope
+十四: 通过注解给属性注入配置和Bean对象
+1、配置属性是只需添加一个beanPostProcessor即可 在scan 注册beanRegister时 讲beanPostProcessor注册进去即可
+2、添加一个PropertyPlaceholderConfigurer解析配置文件。想容器注入一些自定义变量，在填充 value注入的时候， 进行获取
+十五:spring 解决循环依赖， 三级缓存的实现
+1、第一层: Map<String, Object> singletonObjects 存放【最终的单例bean对象】
+2、第二层: Map<String, Object> earlySingletonObjects 存放【提前暴漏对象，没有完全实例化的对象】
+2、第三层: Map<String, ObjectFactory<?>> singletonFactories 存放【代理对象，打破依赖】
+A -> B -> A 当A依赖B    B又依赖A时， 对于A创建的实例，是要提前暴露的，但是对于提前暴露的A。当然暴露A要暴露A的代理对象: 开始先放在 三级缓存中。
+第一层缓存：最基础的缓存，创建完并初始化（createBean）后的bean实例会放入，项目启动完成后获取bean实例时从此获取
+第三层缓存：创建bean过程中用于处理循环依赖的临时缓存，由于只有在初始化时才知道有没有循环依赖，所以通过ObjectFactory临时“存储”刚创建完的bean，并延迟触发循环依赖时被引用的bean需要赋值当前bean时去获取当前bean的逻辑，且获取对象会作为当前bean的最终对象
+第二级缓存：创建bean过程中用于处理循环依赖的临时缓存，搭配第三层缓存，用于其ObjectFactory返回对象的缓存，保证多个关联对象对当前bean的引用为同一个
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
